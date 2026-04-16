@@ -164,7 +164,7 @@ export default function LandingPage() {
             style={{ background: "linear-gradient(135deg, #6366f1, #a855f7)" }}
           >
             <span>Free Scan</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
           </a>
         </div>
       </nav>
@@ -207,7 +207,7 @@ export default function LandingPage() {
             >
               <div className="flex items-center flex-1 pl-5 pr-3 py-4">
                 <svg className="text-slate-400 mr-3 flex-shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
                 <input
                   type="text"
@@ -227,15 +227,15 @@ export default function LandingPage() {
                 {loading ? (
                   <>
                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     Scanning...
                   </>
                 ) : (
                   <>
                     Analyze Now
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
                   </>
                 )}
               </button>
@@ -395,7 +395,7 @@ export default function LandingPage() {
                   <span>⭐</span> Full Optimization — $149
                 </a>
                 <a
-                  href="https://wa.me/1234567890"
+                  href="https://wa.me/03082762326"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-3 p-4 rounded-2xl border border-green-200 bg-green-50 hover:bg-green-100 transition-colors text-green-700 font-semibold text-sm"
@@ -419,12 +419,12 @@ export default function LandingPage() {
                 {/* Mock Browser Bar */}
                 <div className="flex items-center gap-2 px-5 py-3 bg-white border-b border-slate-100">
                   <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-400"/>
-                    <div className="w-3 h-3 rounded-full bg-amber-400"/>
-                    <div className="w-3 h-3 rounded-full bg-emerald-400"/>
+                    <div className="w-3 h-3 rounded-full bg-red-400" />
+                    <div className="w-3 h-3 rounded-full bg-amber-400" />
+                    <div className="w-3 h-3 rounded-full bg-emerald-400" />
                   </div>
                   <div className="mx-auto flex items-center bg-slate-50 border border-slate-200 rounded-lg px-3 py-1 gap-2 text-xs text-slate-400 w-56 justify-center">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                     yourstore.myshopify.com
                   </div>
                 </div>
@@ -495,7 +495,7 @@ export default function LandingPage() {
               className="rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden"
               style={{ background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)" }}
             >
-              <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"/>
+              <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
               <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-2xl mb-6">
                 🔍
               </div>
@@ -543,7 +543,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
             {/* Connector line */}
-            <div className="hidden md:block absolute top-10 left-[calc(16.67%+1rem)] right-[calc(16.67%+1rem)] h-0.5 bg-gradient-to-r from-transparent via-indigo-200 to-transparent"/>
+            <div className="hidden md:block absolute top-10 left-[calc(16.67%+1rem)] right-[calc(16.67%+1rem)] h-0.5 bg-gradient-to-r from-transparent via-indigo-200 to-transparent" />
 
             {[
               { step: "01", icon: "🔗", title: "Enter Your URL", desc: "Paste your Shopify store URL or any page you want to analyze. No login required." },
@@ -581,8 +581,8 @@ export default function LandingPage() {
             style={{ background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)" }}
           >
             <div className="absolute top-0 left-0 w-full h-full opacity-10">
-              <div className="absolute top-4 left-8 w-32 h-32 rounded-full bg-white blur-2xl"/>
-              <div className="absolute bottom-4 right-8 w-24 h-24 rounded-full bg-white blur-xl"/>
+              <div className="absolute top-4 left-8 w-32 h-32 rounded-full bg-white blur-2xl" />
+              <div className="absolute bottom-4 right-8 w-24 h-24 rounded-full bg-white blur-xl" />
             </div>
             <div className="relative z-10">
               <span className="text-4xl mb-4 block">📧</span>
@@ -671,7 +671,7 @@ export default function LandingPage() {
               <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-xs font-black px-4 py-1.5 rounded-bl-2xl">
                 MOST POPULAR
               </div>
-              <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3 blur-2xl"/>
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3 blur-2xl" />
 
               <div className="relative z-10">
                 <div className="mb-6">
@@ -722,8 +722,8 @@ export default function LandingPage() {
       {/* ── Final CTA ───────────────────────────────────────────────────────── */}
       <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)" }}>
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 left-1/4 w-72 h-72 bg-purple-600/20 rounded-full blur-3xl"/>
-          <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl"/>
+          <div className="absolute top-10 left-1/4 w-72 h-72 bg-purple-600/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
@@ -748,7 +748,7 @@ export default function LandingPage() {
               🔍 Analyze My Store — Free
             </a>
             <a
-              href="https://wa.me/1234567890"
+              href="https://wa.me/03082762326"
               target="_blank"
               rel="noopener noreferrer"
               className="px-10 py-4 rounded-full font-bold text-base text-white border border-white/30 hover:bg-white/10 transition-all"
@@ -776,22 +776,22 @@ export default function LandingPage() {
           <div className="flex items-center gap-4 text-sm text-slate-500">
             <a href="#" className="hover:text-white transition-colors">Privacy</a>
             <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Contact</a>
+            <a href="https://wa.me/03082762326" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Contact</a>
           </div>
         </div>
       </footer>
 
       {/* ── Floating WhatsApp Button ─────────────────────────────────────────── */}
       <a
-        href="https://wa.me/1234567890"
+        href="https://wa.me/03082762326"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center shadow-2xl shadow-green-500/40 transition-all hover:scale-110 active:scale-95"
         title="Chat on WhatsApp"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.549 4.118 1.515 5.847L.057 23.884a.5.5 0 0 0 .61.61l6.037-1.458A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.94 9.94 0 0 1-5.074-1.383l-.364-.216-3.767.91.927-3.766-.236-.374A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.549 4.118 1.515 5.847L.057 23.884a.5.5 0 0 0 .61.61l6.037-1.458A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.94 9.94 0 0 1-5.074-1.383l-.364-.216-3.767.91.927-3.766-.236-.374A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
         </svg>
       </a>
     </div>

@@ -108,15 +108,15 @@ function ScoreCircle({ score }: { score: number }) {
 // ─── Issue Row ────────────────────────────────────────────────────────────────
 function IssueRow({ issue, locked }: { issue: Issue; locked?: boolean }) {
   const cfg = {
-    ok:    { icon: "✓", iconBg: "bg-emerald-100", iconColor: "text-emerald-600", border: "border-emerald-100", bg: "bg-emerald-50/50" },
-    warn:  { icon: "⚠", iconBg: "bg-amber-100",   iconColor: "text-amber-600",   border: "border-amber-100",   bg: "bg-amber-50/50"   },
-    error: { icon: "✕", iconBg: "bg-red-100",      iconColor: "text-red-600",     border: "border-red-100",     bg: "bg-red-50/50"     },
+    ok: { icon: "✓", iconBg: "bg-emerald-100", iconColor: "text-emerald-600", border: "border-emerald-100", bg: "bg-emerald-50/50" },
+    warn: { icon: "⚠", iconBg: "bg-amber-100", iconColor: "text-amber-600", border: "border-amber-100", bg: "bg-amber-50/50" },
+    error: { icon: "✕", iconBg: "bg-red-100", iconColor: "text-red-600", border: "border-red-100", bg: "bg-red-50/50" },
   }[issue.type];
 
   const impactBadge = {
-    high:   "bg-red-100 text-red-600",
+    high: "bg-red-100 text-red-600",
     medium: "bg-amber-100 text-amber-600",
-    low:    "bg-slate-100 text-slate-500",
+    low: "bg-slate-100 text-slate-500",
   }[issue.impact];
 
   return (
@@ -171,8 +171,8 @@ export default function ResultPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const okCount    = data?.issues.filter((i) => i.type === "ok").length ?? 0;
-  const warnCount  = data?.issues.filter((i) => i.type === "warn").length ?? 0;
+  const okCount = data?.issues.filter((i) => i.type === "ok").length ?? 0;
+  const warnCount = data?.issues.filter((i) => i.type === "warn").length ?? 0;
   const errorCount = data?.issues.filter((i) => i.type === "error").length ?? 0;
 
   const handleUnlock = (e: React.FormEvent) => {
@@ -219,7 +219,7 @@ export default function ResultPage() {
 
   // Issues split: show first 5 always, rest locked behind email
   const visibleIssues = data.issues.slice(0, 5);
-  const lockedIssues  = data.issues.slice(5);
+  const lockedIssues = data.issues.slice(5);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]" style={{ fontFamily: "var(--font-sans)" }}>
@@ -486,7 +486,7 @@ export default function ResultPage() {
                     Full Optimization — $149
                   </a>
                   <a
-                    href="https://wa.me/1234567890"
+                    href="https://wa.me/03082762326"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-white/20 text-white/80 text-xs font-semibold hover:bg-white/10 transition-all"
@@ -556,15 +556,15 @@ export default function ResultPage() {
 
       {/* ── Floating WhatsApp ─────────────────────────────────────────────── */}
       <a
-        href="https://wa.me/1234567890"
+        href="https://wa.me/03082762326"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center shadow-2xl shadow-green-500/40 transition-all hover:scale-110"
         title="Chat on WhatsApp"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.549 4.118 1.515 5.847L.057 23.884a.5.5 0 0 0 .61.61l6.037-1.458A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.94 9.94 0 0 1-5.074-1.383l-.364-.216-3.767.91.927-3.766-.236-.374A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.549 4.118 1.515 5.847L.057 23.884a.5.5 0 0 0 .61.61l6.037-1.458A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.94 9.94 0 0 1-5.074-1.383l-.364-.216-3.767.91.927-3.766-.236-.374A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
         </svg>
       </a>
     </div>

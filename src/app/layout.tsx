@@ -26,6 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} scroll-smooth`}>
+      <meta name="google-adsense-account" content="ca-pub-8517681264003887"></meta>
       <head>
         <Script
           async

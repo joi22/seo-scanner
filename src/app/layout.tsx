@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   description:
     "Free Shopify SEO analyzer tool. Get your SEO score, performance report, and actionable insights instantly. No credit card required.",
   keywords: "Shopify SEO, SEO analyzer, Shopify store audit, SEO score, page speed",
+  other: {
+    "google-adsense-account": "ca-pub-8517681264003887",
+  },
 };
 
 export default function RootLayout({

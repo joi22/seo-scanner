@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
   },
   // Skip type/lint checks during `next build` so CI is faster during dev
   typescript: { ignoreBuildErrors: false },
-  eslint: { ignoreDuringBuilds: false },
 };
 
 export default nextConfig;

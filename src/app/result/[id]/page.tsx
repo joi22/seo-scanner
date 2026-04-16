@@ -5,6 +5,30 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 
+// ─── AdSense Component ────────────────────────────────────────────────────────
+function AdSenseMainBlock() {
+  useEffect(() => {
+    try {
+      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+    } catch (error) {
+      console.error("AdSense error:", error);
+    }
+  }, []);
+
+  return (
+    <div className="w-full max-w-5xl mx-auto mb-8 px-6 overflow-hidden flex justify-center">
+      <ins
+        className="adsbygoogle"
+        style={{ display: "block", width: "100%" }}
+        data-ad-client="ca-pub-8517681264003887"
+        data-ad-slot="9446465008"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      ></ins>
+    </div>
+  );
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Issue {
   type: "ok" | "warn" | "error";
@@ -304,6 +328,9 @@ export default function ResultPage() {
             />
           </div>
         </div>
+
+        {/* ── Main AdSense Block ────────────────────────────────────────────── */}
+        <AdSenseMainBlock />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 

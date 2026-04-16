@@ -1,8 +1,32 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+
+// ─── AdSense Component ────────────────────────────────────────────────────────
+function AdSenseMainBlock() {
+  useEffect(() => {
+    try {
+      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+    } catch (error) {
+      console.error("AdSense error:", error);
+    }
+  }, []);
+
+  return (
+    <div className="w-full max-w-5xl mx-auto my-12 px-6 overflow-hidden flex justify-center">
+      <ins
+        className="adsbygoogle"
+        style={{ display: "block", width: "100%" }}
+        data-ad-client="ca-pub-8517681264003887"
+        data-ad-slot="9446465008"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      ></ins>
+    </div>
+  );
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface ScanResult {
@@ -460,6 +484,9 @@ export default function LandingPage() {
           )}
         </div>
       </section>
+
+      {/* ── Main AdSense Block ────────────────────────────────────────────── */}
+      <AdSenseMainBlock />
 
       {/* ── Features Section ────────────────────────────────────────────────── */}
       <section id="features" className="py-24 bg-slate-50">

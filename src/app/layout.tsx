@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,17 +27,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-smooth`}>
-      <meta name="google-adsense-account" content="ca-pub-8517681264003887"></meta>
+    <html lang="en" className={`${inter.variable} scroll-smooth`} data-scroll-behavior="smooth">
       <head>
-        <Script
+        <meta name="google-adsense-account" content="ca-pub-8517681264003887"></meta>
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8517681264003887"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
       </head>
-      <body className="min-h-full antialiased">{children}</body>
+      <body className="min-h-screen bg-white antialiased">
+        <Navbar />
+        <main>{children}</main>
+        <Footer />
+      </body>
     </html>
   );
 }

@@ -9,12 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@sendgrid/mail": "^8.1.6",
     "axios": "^1.14.0",
     "cheerio": "^1.2.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
     "keyword-extractor": "^0.0.28",
+    "lucide-react": "^1.8.0",
     "next": "16.2.2",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

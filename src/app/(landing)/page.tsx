@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { Sparkles, Target, Zap, BarChart3, Plus, X, Check } from "lucide-react";
 
 // ─── AdSense Component ────────────────────────────────────────────────────────
 function AdSenseBlock({ slot }: { slot: string }) {
@@ -119,6 +120,8 @@ function IssueItem({
 export default function LandingPage() {
   const router = useRouter();
   const [url, setUrl] = useState("");
+  const [competitorUrl, setCompetitorUrl] = useState("");
+  const [showCompetitor, setShowCompetitor] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [error, setError] = useState("");
@@ -136,7 +139,7 @@ export default function LandingPage() {
     setUnlocked(false);
     setEmailSubmitted(false);
     try {
-      const res = await axios.post("/api/scan", { url });
+      const res = await axios.post("/api/scan", { url, competitorUrl });
       const { id, data } = res.data;
       if (id) {
         router.push(`/result/${id}`);
@@ -165,15 +168,17 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section id="hero" className="relative pt-20 pb-16 overflow-hidden">
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-8 border"
-            style={{ background: "linear-gradient(135deg, #ede9fe, #faf5ff)", borderColor: "#d8b4fe", color: "#7c3aed" }}>
-            <span>⚡</span> Free Shopify SEO Analyzer Tool
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-black mb-8 border shadow-lg shadow-indigo-100"
+            style={{ background: "linear-gradient(135deg, #f5f3ff, #ede9fe)", borderColor: "#c4b5fd", color: "#6d28d9" }}>
+            <Sparkles className="w-4 h-4 animate-pulse" />
+            <span>AI-POWERED SEO OPTIMIZATION</span>
           </div>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight mb-8 text-slate-900">
-            Improve Your Store Ranking with <span className="text-indigo-600">Free Analysis</span>
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight mb-8 text-slate-900">
+            Fix Your Shopify <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">SEO in Minutes</span>
           </h1>
-          <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed mb-4 font-medium">
-            If you own a Shopify store, optimizing your SEO is essential to rank higher on Google and drive more organic traffic.
+          <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed mb-4 font-medium italic">
+            "Transform your store's search visibility with AI-generated fixes, competitor insights, and a personalized SEO roadmap."
           </p>
         </div>
       </section>
@@ -197,41 +202,91 @@ export default function LandingPage() {
       <section className="py-12 bg-slate-50">
         <div className="max-w-4xl mx-auto px-6">
           <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-indigo-100 border border-slate-100">
-            <form onSubmit={handleScan} className="max-w-2xl mx-auto">
-              <div className="flex flex-col sm:flex-row bg-slate-50 rounded-2xl sm:rounded-full border border-slate-200 p-2 transition-all focus-within:ring-4 focus-within:ring-indigo-100">
-                <div className="flex items-center flex-1 px-4 py-3">
-                  <svg className="text-slate-400 mr-3 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  <input
-                    type="text"
-                    placeholder="yourstore.myshopify.com"
-                    className="w-full bg-transparent text-slate-800 placeholder:text-slate-400 outline-none font-medium text-base"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    id="url-input"
-                    suppressHydrationWarning
-                  />
+            <form onSubmit={handleScan} className="max-w-3xl mx-auto space-y-6">
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row bg-slate-50 rounded-3xl border-2 border-slate-200 p-2 transition-all focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-100 shadow-inner">
+                  <div className="flex items-center flex-1 px-4 py-3">
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm mr-3">
+                      <Target className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Enter Your Store URL (e.g. gymshark.com)"
+                      className="w-full bg-transparent text-slate-800 placeholder:text-slate-400 outline-none font-bold text-lg"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-10 py-4 rounded-2xl text-base font-black text-white transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60 shadow-xl shadow-indigo-400/30"
+                    style={{ background: "linear-gradient(135deg, #6366f1, #a855f7)" }}
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                         <Zap className="animate-pulse w-5 h-5 fill-white" />
+                        Analyzing...
+                      </span>
+                    ) : (
+                      <>Analyze & Fix <Sparkles className="w-5 h-5" /></>
+                    )}
+                  </button>
                 </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  suppressHydrationWarning
-                  className="px-8 py-4 rounded-full text-sm font-bold text-white transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg shadow-indigo-400/30"
-                  style={{ background: "linear-gradient(135deg, #6366f1, #a855f7)" }}
-                >
-                  {loading ? (
-                    <span className="flex items-center gap-2">
-                       <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Scanning...
-                    </span>
-                  ) : (
-                    <>Analyze Now <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg></>
-                  )}
-                </button>
+
+                {!showCompetitor ? (
+                  <button 
+                    type="button"
+                    onClick={() => setShowCompetitor(true)}
+                    className="text-xs font-black text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5 px-4"
+                  >
+                    <Plus className="w-3 h-3" /> Add Competitor for Comparison
+                  </button>
+                ) : (
+                  <div className="flex items-center bg-orange-50/50 rounded-3xl border-2 border-orange-100 p-2 animate-in zoom-in-95 duration-200">
+                    <div className="flex items-center flex-1 px-4 py-3">
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm mr-3">
+                        <BarChart3 className="w-5 h-5 text-orange-500" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Competitor URL (Optional)"
+                        className="w-full bg-transparent text-slate-800 placeholder:text-slate-400 outline-none font-bold text-lg"
+                        value={competitorUrl}
+                        onChange={(e) => setCompetitorUrl(e.target.value)}
+                      />
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => { setShowCompetitor(false); setCompetitorUrl(""); }}
+                      className="p-3 text-slate-400 hover:text-red-500"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-center gap-8 mt-8 opacity-60">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-600">
+                    <Check className="w-3 h-3 stroke-[3px]" />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Core Web Vitals</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-600">
+                    <Check className="w-3 h-3 stroke-[3px]" />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">AI Search Visibility</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-600">
+                    <Check className="w-3 h-3 stroke-[3px]" />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Competitor Gaps</span>
+                </div>
               </div>
               {error && (
                 <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 font-medium animate-shake">

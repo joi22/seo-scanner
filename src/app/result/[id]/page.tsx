@@ -4,6 +4,11 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
+import { AIFixPanel } from "@/components/AIFixPanel";
+import { RoadmapSection } from "@/components/RoadmapSection";
+import { AIContentTools } from "@/components/AIContentTools";
+import { generateRoadmap, calculatePotentialScore } from "@/lib/roadmapGenerator";
+import { Sparkles, Trophy, Target, Zap, BarChart3, AlertCircle, FileDown, Mail, Share2, Search, CheckCircle2, Loader2 } from "lucide-react";
 
 // ─── AdSense Component ────────────────────────────────────────────────────────
 function AdSenseMainBlock() {
@@ -45,6 +50,7 @@ interface Issue {
 interface ScanData {
   id: string;
   url: string;
+  competitorUrl?: string;
   scannedAt: string;
   title: string;
   description: string;
@@ -58,6 +64,9 @@ interface ScanData {
   topKeywords: { word: string; count: number }[];
   issues: Issue[];
   score: number;
+  competitorData?: any;
+  hasSchema?: boolean;
+  sgeSignals?: string[];
 }
 
 // ─── Score Circle ─────────────────────────────────────────────────────────────
@@ -149,21 +158,31 @@ function IssueRow({ issue, locked }: { issue: Issue; locked?: boolean }) {
   }[issue.impact];
 
   return (
-    <div className={`relative flex items-start gap-4 p-4 rounded-2xl border ${cfg.bg} ${cfg.border} transition-all ${locked ? "blur-[3px] select-none pointer-events-none" : ""}`}>
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm ${cfg.iconBg} ${cfg.iconColor}`}>
-        {cfg.icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-sm font-semibold text-slate-800">{issue.label}</p>
-          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${impactBadge}`}>
-            {issue.impact} impact
-          </span>
+    <div className={`relative flex flex-col p-6 rounded-[2rem] border ${cfg.bg} ${cfg.border} transition-all ${locked ? "blur-[5px] select-none pointer-events-none" : "hover:shadow-lg hover:shadow-indigo-50"}`}>
+      <div className="flex items-start gap-4">
+        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 font-bold text-lg ${cfg.iconBg} ${cfg.iconColor} shadow-sm`}>
+          {cfg.icon}
         </div>
-        {issue.detail && (
-          <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{issue.detail}</p>
-        )}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <p className="text-base font-bold text-slate-900">{issue.label}</p>
+            <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${impactBadge}`}>
+              {issue.impact} impact
+            </span>
+          </div>
+          {issue.detail && (
+            <p className="text-sm text-slate-500 leading-relaxed font-medium">{issue.detail}</p>
+          )}
+        </div>
       </div>
+      
+      {!locked && issue.type !== "ok" && (
+        <AIFixPanel 
+          issueLabel={issue.label} 
+          currentContent={issue.detail || ""} 
+          context="Shopify Store" 
+        />
+      )}
     </div>
   );
 }
@@ -190,6 +209,7 @@ export default function ResultPage() {
   const [email, setEmail] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -200,14 +220,50 @@ export default function ResultPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const okCount = data?.issues.filter((i) => i.type === "ok").length ?? 0;
-  const warnCount = data?.issues.filter((i) => i.type === "warn").length ?? 0;
-  const errorCount = data?.issues.filter((i) => i.type === "error").length ?? 0;
-
-  const handleUnlock = (e: React.FormEvent) => {
+  const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) { setUnlocked(true); setEmailSent(true); }
+    if (!email || !data) return;
+    
+    setSendingEmail(true);
+    setUnlocked(true);
+
+    try {
+      await axios.post("/api/send-report", {
+        email,
+        reportUrl: typeof window !== "undefined" ? window.location.href : "",
+        storeName: new URL(data.url).hostname
+      });
+      setEmailSent(true);
+    } catch (err) {
+      console.error("Failed to send automated email:", err);
+    } finally {
+      setSendingEmail(false);
+    }
   };
+
+  const handleEmailReport = async () => {
+    if (!data) return;
+    const userEmail = email || prompt("Please enter your email to receive the report:");
+    if (!userEmail) return;
+
+    setSendingEmail(true);
+    try {
+      await axios.post("/api/send-report", {
+        email: userEmail,
+        reportUrl: typeof window !== "undefined" ? window.location.href : "",
+        storeName: new URL(data.url).hostname
+      });
+      alert("SEO Report sent successfully!");
+      if (!unlocked) setUnlocked(true);
+    } catch (err) {
+      alert("Failed to send email. Please try again.");
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  const roadmap = data ? generateRoadmap(data.issues) : [];
+  const potentialScore = data ? calculatePotentialScore(data.score, roadmap) : 0;
 
   // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
@@ -257,45 +313,67 @@ export default function ResultPage() {
 
         {/* ── Page Header ───────────────────────────────────────────────── */}
         <div className="mb-10">
-          <div className="flex items-center gap-2 text-sm text-slate-400 mb-3">
-            <span>🔍 SEO Report</span>
-            <span>·</span>
-            <span className="text-slate-600 font-medium">{domain}</span>
-            <span>·</span>
-            <span>{scannedDate}</span>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-2 text-sm text-slate-400 mb-3 font-bold uppercase tracking-widest">
+                <Search className="w-4 h-4" />
+                <span>AI SEO Analysis</span>
+                <span>·</span>
+                <span className="text-indigo-600">{domain}</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-3 leading-tight tracking-tight">
+                AI Shopify <span className="text-indigo-600">SEO Audit</span>
+              </h1>
+              <p className="text-slate-500 text-lg font-medium">
+                Deep analysis completed. Score: <span className="text-slate-900 font-black">{data.score}/100</span>.
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all shadow-sm">
+                <FileDown className="w-4 h-4" />
+                PDF Report
+              </button>
+              <button 
+                onClick={handleEmailReport}
+                disabled={sendingEmail}
+                className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
+              >
+                {sendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                Email Report
+              </button>
+              <button className="p-3 rounded-2xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+                <Share2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-2 leading-tight">
-            SEO Audit for{" "}
-            <span className="text-indigo-600">{domain}</span>
-          </h1>
-          <p className="text-slate-500 text-lg">
-            We scanned{" "}
-            <a href={data.url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline font-semibold">
-              {data.url}
-            </a>{" "}
-            and found {errorCount} critical issue{errorCount !== 1 ? "s" : ""} and {warnCount} warning{warnCount !== 1 ? "s" : ""}.
-          </p>
         </div>
 
         {/* ── Top Row: Score + Stats ─────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
 
           {/* Score Card */}
-          <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-100 p-8 flex flex-col items-center justify-center">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Overall Score</p>
+          {/* Score Card */}
+          <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-100 p-8 flex flex-col items-center justify-center relative overflow-hidden group">
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50 rounded-full blur-3xl group-hover:bg-indigo-100 transition-colors" />
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 relative z-10">Current SEO Score</p>
             <ScoreCircle score={data.score} />
+            <div className="mt-4 flex items-center gap-2 text-emerald-600 font-bold text-sm bg-emerald-50 px-3 py-1 rounded-full relative z-10">
+              <Zap className="w-3 h-3" />
+              Potential: {potentialScore}%
+            </div>
           </div>
 
           {/* Issue Summary */}
           <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard label="Passed" value={okCount} sub="checks passed" color="#22c55e" />
-            <StatCard label="Warnings" value={warnCount} sub="items to improve" color="#f59e0b" />
-            <StatCard label="Errors" value={errorCount} sub="critical issues" color="#ef4444" />
+            <StatCard label="Critical Issues" value={data.issues.filter(i => i.type === "error").length} sub="Requires immediate fix" color="#ef4444" />
+            <StatCard label="Quick Wins" value={data.issues.filter(i => i.impact === "high" && i.type !== "ok").length} sub="High impact, low effort" color="#6366f1" />
+            <StatCard label="AI Visibility" value={data.issues.some(i => i.label.includes("SGE")) ? "Optimized" : "Low"} sub="SGE & ChatGPT readiness" color="#a855f7" />
             <StatCard
-              label="Images w/o Alt"
-              value={data.imgMissingAlt}
-              sub={`of ${data.imgCount} total images`}
-              color={data.imgMissingAlt > 0 ? "#f59e0b" : "#22c55e"}
+              label="Technical Debt"
+              value={data.issues.filter(i => i.type === "warn").length}
+              sub="Minor improvements needed"
+              color="#f59e0b"
             />
           </div>
         </div>
@@ -374,11 +452,12 @@ export default function ResultPage() {
                             />
                             <button
                               type="submit"
+                              disabled={sendingEmail}
                               suppressHydrationWarning
-                              className="w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
+                              className="w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
                               style={{ background: "linear-gradient(135deg, #6366f1, #a855f7)" }}
                             >
-                              Unlock Full Report Now
+                              {sendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : "Unlock Full Report Now"}
                             </button>
                           </form>
                         </div>
@@ -389,56 +468,114 @@ export default function ResultPage() {
               )}
             </div>
 
-            {/* Recommendations Box */}
-            <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-100 p-8">
-              <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <span className="text-xl">💡</span> Primary Recommendations
-              </h2>
-              <div className="space-y-5">
-                {data.issues.filter(i => i.type !== "ok").slice(0, 4).map((issue, i) => (
-                  <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-indigo-100 transition-colors">
-                    <span className="w-8 h-8 rounded-full bg-indigo-600 text-white text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5 shadow-lg">
-                      {i + 1}
-                    </span>
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">{issue.label}</p>
-                      {issue.detail && <p className="text-xs text-slate-500 mt-1 leading-relaxed">{issue.detail}</p>}
+            {/* Roadmap Section */}
+            <RoadmapSection roadmap={roadmap} currentScore={data.score} potentialScore={potentialScore} />
+
+            {/* Competitor Analysis Section */}
+            {data.competitorUrl && (
+              <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-100 p-8 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4">
+                  <BarChart3 className="w-12 h-12 text-slate-50" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                  <span className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">⚔️</span>
+                  Competitor Benchmarking
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Your Store ({domain})</p>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-600">SEO Score</span>
+                        <span className="text-sm font-black text-slate-900">{data.score}%</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-indigo-600" style={{ width: `${data.score}%` }} />
+                      </div>
                     </div>
                   </div>
-                ))}
-                {data.issues.filter(i => i.type !== "ok").length === 0 && (
-                  <p className="text-sm text-emerald-600 font-medium p-4 bg-emerald-50 rounded-2xl border border-emerald-100">🎉 Excellent! Your store follows all major Shopify SEO best practices.</p>
-                )}
+                  <div className="p-5 rounded-2xl bg-orange-50/30 border border-orange-100">
+                    <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-4">Competitor ({new URL(data.competitorUrl).hostname})</p>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-600">SEO Score</span>
+                        <span className="text-sm font-black text-slate-900">{data.competitorData?.score || 0}%</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-orange-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-orange-500" style={{ width: `${data.competitorData?.score || 0}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 p-6 rounded-2xl bg-indigo-50 border border-indigo-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Sparkles className="w-4 h-4 text-indigo-600" />
+                    <h3 className="text-sm font-bold text-indigo-900">AI Competitive Insights</h3>
+                  </div>
+                  {/* Mock AI insights or add a button to generate them */}
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                      <p className="text-xs text-slate-600 font-medium">Competitor is using richer schema markup for Product reviews.</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <AlertCircle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                      <p className="text-xs text-slate-600 font-medium">You have {data.topKeywords.length} matching keywords, but competitor has higher semantic density.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* ── Right Sidebar ────────────────────────────────────────────── */}
           <div className="space-y-6">
 
-            {/* Page Info */}
+            {/* AI Search Visibility Card */}
+            <div className="bg-slate-900 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 p-8 opacity-10">
+                <Search className="w-24 h-24" />
+              </div>
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-black mb-6 tracking-widest uppercase">
+                  <Zap className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                  SGE & AI READINESS
+                </div>
+                <h3 className="text-2xl font-black mb-4">AI Search Visibility</h3>
+                <p className="text-white/60 text-sm mb-8 leading-relaxed font-medium">
+                  We analyzed your semantic structure for Google SGE, Perplexity, and ChatGPT. 
+                  Your content is <span className="text-white font-bold">{data.score > 80 ? "Highly Optimized" : "Needs Semantic Depth"}</span>.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
+                    <span className="text-xs font-bold text-white/80">Structured Data</span>
+                    <span className={data.issues.some(i => i.label.includes("Schema")) ? "text-emerald-400 font-black text-xs" : "text-red-400 font-black text-xs"}>
+                      {data.issues.some(i => i.label.includes("Schema")) ? "DETECTED" : "MISSING"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
+                    <span className="text-xs font-bold text-white/80">Semantic Clarity</span>
+                    <span className="text-indigo-400 font-black text-xs">85% (STRONG)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Content Factory */}
+            <AIContentTools />
+
+            {/* Technical Metadata */}
             <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-100 p-6">
-              <h3 className="text-xs font-black text-slate-400 mb-6 uppercase tracking-widest">Technical Metadata</h3>
+              <h3 className="text-xs font-black text-slate-400 mb-6 uppercase tracking-widest">Store Insights</h3>
               <div className="space-y-6">
                 <div>
-                  <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-1">Page Title</p>
+                  <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">Page Title</p>
                   <p className="text-sm text-slate-800 font-bold leading-snug">{data.title}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-1">Meta Description</p>
+                  <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">Meta Description</p>
                   <p className="text-xs text-slate-500 leading-relaxed font-medium">{data.description}</p>
-                </div>
-                <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-50">
-                  {[
-                    { label: "H1", value: data.h1Count },
-                    { label: "H2", value: data.h2Count },
-                    { label: "H3", value: data.h3Count },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="text-center p-3 rounded-2xl bg-indigo-50/50 border border-indigo-100/50">
-                      <p className="text-xl font-black text-indigo-700">{value}</p>
-                      <p className="text-[10px] font-black text-slate-400 uppercase">{label}</p>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>

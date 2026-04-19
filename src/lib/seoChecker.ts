@@ -14,6 +14,8 @@ export interface SeoCheckResult {
   hasViewport: boolean;
   issues: Issue[];
   score: number;
+  hasSchema?: boolean;
+  sgeSignals?: string[];
 }
 
 /** Run all SEO checks on the raw HTML string */
@@ -134,6 +136,29 @@ export function checkSeo(html: string): SeoCheckResult {
     issues.push({ type: "warn", label: "Viewport meta tag missing", detail: "Required for mobile-friendly pages", impact: "medium" });
   }
 
+  // ── Schema / Structured Data ──────────────────────────────────────────
+  const jsonLd = $('script[type="application/ld+json"]');
+  const hasSchema = jsonLd.length > 0;
+  if (hasSchema) {
+    issues.push({ type: "ok", label: "Structured Data (Schema.org) detected", detail: `${jsonLd.length} JSON-LD blocks found`, impact: "high" });
+    score += 10;
+  } else {
+    issues.push({ type: "warn", label: "Missing Structured Data", detail: "Schema markup helps AI search engines understand your products", impact: "high" });
+  }
+
+  // ── Semantic / SGE Readiness ──────────────────────────────────────────
+  const bodyText = $("body").text().toLowerCase();
+  const semanticSignals = ["how to", "what is", "best", "guide", "review", "free shipping", "return policy"];
+  const foundSignals = semanticSignals.filter(s => bodyText.includes(s));
+  const sgeScore = foundSignals.length * 2;
+  
+  if (foundSignals.length > 2) {
+    issues.push({ type: "ok", label: "High AI Search Visibility (SGE)", detail: "Semantic clarity and answer-style content detected", impact: "medium" });
+    score += Math.min(10, sgeScore);
+  } else {
+    issues.push({ type: "warn", label: "Low AI Search Visibility", detail: "Content lacks semantic depth for AI-powered search (ChatGPT/SGE)", impact: "medium" });
+  }
+
   const h3Count = $("h3").length;
 
   return {
@@ -149,5 +174,7 @@ export function checkSeo(html: string): SeoCheckResult {
     hasViewport,
     issues,
     score: Math.min(MAX_SCORE, Math.max(0, score)),
+    hasSchema,
+    sgeSignals: foundSignals
   };
 }

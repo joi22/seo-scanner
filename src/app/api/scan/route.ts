@@ -7,51 +7,53 @@ import { saveResult, generateId } from "@/lib/store";
 
 export async function POST(req: Request) {
   try {
-    const { url } = await req.json();
+    const { url, competitorUrl } = await req.json();
 
     if (!url || typeof url !== "string") {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
     const validUrl = url.startsWith("http") ? url : `https://${url}`;
+    const validCompetitorUrl = competitorUrl ? (competitorUrl.startsWith("http") ? competitorUrl : `https://${competitorUrl}`) : null;
 
     // ── Fetch the page ────────────────────────────────────────────────────
-    let html: string;
-    try {
-      const response = await axios.get(validUrl, {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-          "Accept-Language": "en-US,en;q=0.5",
-        },
-        timeout: 15000,
-        maxRedirects: 5,
-      });
-      html = response.data;
-    } catch (fetchErr: any) {
-      return NextResponse.json(
-        {
-          error:
-            fetchErr.code === "ECONNABORTED"
-              ? "The site took too long to respond (15s timeout). Try again."
-              : `Could not reach "${validUrl}". Is it publicly accessible?`,
-        },
-        { status: 422 }
-      );
+    async function fetchHtml(targetUrl: string) {
+      try {
+        const response = await axios.get(targetUrl, {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          },
+          timeout: 10000,
+        });
+        return response.data;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    const html = await fetchHtml(validUrl);
+    if (!html) {
+      return NextResponse.json({ error: `Could not reach "${validUrl}".` }, { status: 422 });
+    }
+
+    let competitorHtml = null;
+    if (validCompetitorUrl) {
+      competitorHtml = await fetchHtml(validCompetitorUrl);
     }
 
     // ── Run SEO checks ────────────────────────────────────────────────────
     const seo = checkSeo(html);
+    const competitorSeo = competitorHtml ? checkSeo(competitorHtml) : null;
 
-    // ── Extract keywords from visible body text ────────────────────────────
+    // ── Extract keywords ─────────────────────────────────────────────────
     const { load } = await import("cheerio");
-    const $ = load(html);
-    $("script, style, noscript, nav, footer, iframe, header").remove();
-    const bodyText = $("body").text().replace(/\s+/g, " ").trim();
-
-    let topKeywords: { word: string; count: number }[] = [];
-    if (bodyText) {
+    function getKeywords(htmlString: string) {
+      const $ = load(htmlString);
+      $("script, style, noscript, nav, footer, iframe, header").remove();
+      const bodyText = $("body").text().replace(/\s+/g, " ").trim();
+      if (!bodyText) return [];
+      
       const keywords: string[] = keywordExtractor.extract(bodyText, {
         language: "english",
         remove_digits: true,
@@ -62,11 +64,14 @@ export async function POST(req: Request) {
       for (const kw of keywords) {
         if (kw.length > 3) freq[kw] = (freq[kw] || 0) + 1;
       }
-      topKeywords = Object.entries(freq)
+      return Object.entries(freq)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 12)
+        .slice(0, 10)
         .map(([word, count]) => ({ word, count }));
     }
+
+    const topKeywords = getKeywords(html);
+    const competitorKeywords = competitorHtml ? getKeywords(competitorHtml) : [];
 
     // ── Save to store & return ─────────────────────────────────────────────
     const id = generateId();
@@ -74,19 +79,14 @@ export async function POST(req: Request) {
     const resultData = {
       id,
       url: validUrl,
+      competitorUrl: validCompetitorUrl,
       scannedAt: new Date().toISOString(),
-      title: seo.title,
-      description: seo.description,
-      h1Count: seo.h1Count,
-      h2Count: seo.h2Count,
-      h3Count: seo.h3Count,
-      imgCount: seo.imgCount,
-      imgMissingAlt: seo.imgMissingAlt,
-      hasCanonical: seo.hasCanonical,
-      hasViewport: seo.hasViewport,
+      ...seo,
       topKeywords,
-      issues: seo.issues,
-      score: seo.score,
+      competitorData: competitorSeo ? {
+        ...competitorSeo,
+        topKeywords: competitorKeywords
+      } : null,
     };
 
     saveResult(resultData);
